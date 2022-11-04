@@ -1,0 +1,12 @@
+@import '../colors.scss';
+
+.sideBar {
+  width: 100%;
+  background-color: $tertiary-color;
+  color: white;
+  z-index: 1;
+}
+
+.nestedNav {
+  padding-left: 15px;
+}

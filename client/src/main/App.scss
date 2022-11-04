@@ -1,0 +1,30 @@
+@import '../colors.scss';
+
+.App {
+  text-align: center;
+  background-color: black;
+  display: flex;
+  flex-flow: column;
+  height: 100vh;
+}
+
+.header {
+  flex: 0 1 auto;
+}
+
+.sideBarContainer {
+  width: 15%;
+  position: absolute;
+  top: -10px;
+  left: -10px;
+}
+
+.mainView {
+  width: calc(100% - 20px);
+  height: 300px;
+  margin: 10px;
+  background-color: $base-color;
+  // background-color: white;
+  flex: 1 1 auto;
+  position: relative;
+}
