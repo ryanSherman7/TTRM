@@ -1,0 +1,39 @@
+@import '../../colors.scss';
+
+.box {
+  margin: 5px;
+  width: calc(100% - 10px);
+}
+
+.tabGroup {
+  padding: 0px 10px;
+  display: flex;
+}
+
+.defaultTabs {
+  // width: 400px !important;
+  flex-shrink: 0;
+}
+
+.MuiTab-textColorPrimary,
+.MuiTabScrollButton-root {
+  color: $fontColor !important;
+}
+
+.Mui-selected {
+  color: #90caf9 !important;
+}
+
+.vericalDivider {
+  // margin: 0;
+  margin: 12px 12px 12px 12px;
+}
+
+.addNew {
+  margin-top: auto;
+  margin-bottom: auto;
+  cursor: pointer;
+  stroke: $fontColor;
+  stroke-width: 2;
+  margin-right: 5px;
+}

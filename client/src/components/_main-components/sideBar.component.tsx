@@ -1,4 +1,4 @@
-import './titleBar.scss';
+// import './titleBar.scss';
 import * as React from 'react';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
@@ -8,7 +8,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import './sideBar.scss';
+import './sideBar.style.scss';
 import { useLocation } from 'react-router-dom'
 import Collapse from '@mui/material/Collapse';
 
@@ -55,12 +55,12 @@ export default function SideBar() {
       <List>
         {['Messages', 'My Collection', 'List Workshop', 'Market'].map((text, index) => (
           <React.Fragment>
-            <ListItem key={text} disablePadding onClick={handleClick}>
+            <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                 </ListItemIcon>
                 <ListItemText primary={text} />
-                {showDropDown(text) ? (open ? <ExpandLess /> : <ExpandMore />) : null}
+                {showDropDown(text) ? (open ? <ExpandLess onClick={handleClick} /> : <ExpandMore onClick={handleClick} />) : null}
               </ListItemButton>
             </ListItem>
             {GetRoute() === '/' && text === 'My Collection' ? renderListNames() : null}
