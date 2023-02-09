@@ -1,15 +1,17 @@
 import express = require('express');
 const router = express.Router();
 const responseHandler = require('../services/responseHandler.service.ts');
-const User = require('../db/models/user.schema.ts')
+const UserService = require('../services/user.service.ts')
 const logger = require('../services/logger.service.ts');
+
+function canCall(req: express.Request): boolean {
+  console.log(req);
+  return false;
+}
 
 router.post('/user/create', async (request: express.Request, response: express.Response) => {
   try {
-    const user = new User(request.body);
-    const userDoc = await user.create();
-
-    responseHandler.success(response, userDoc, "User created.");
+    UserService.create(request.body, response);
   } catch (ex: any) {
     logger.error(ex)
     responseHandler.error(response, null, ex.message)
@@ -21,10 +23,25 @@ router.post('/user/create', async (request: express.Request, response: express.R
 //   responseHandler.success(response, null, "User updated.");
 // });
 
-// router.post('/user/deactivate', (request: express.Request, response: express.Response) => {
+router.post('/user/deactivate/:id', async (request: express.Request, response: express.Response) => {
+  try {
+    const userId: string = request.params.id;
+    UserService.deactivate(userId, response);
+  } catch(ex: any) {
+    logger.error(ex)
+    responseHandler.error(response, null, ex.message)
+  }
+});
 
-//   responseHandler.success(response, null, "User deactivated.");
-// });
+router.post('/user/activate/:id', async (request: express.Request, response: express.Response) => {
+  try {
+    const userId: string = request.params.id;
+    UserService.activate(userId, response);
+  } catch(ex: any) {
+    logger.error(ex)
+    responseHandler.error(response, null, ex.message)
+  }
+});
 
 // router.post('/user/login', (request: express.Request, response: express.Response) => {
 

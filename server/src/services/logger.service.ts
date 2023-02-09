@@ -1,4 +1,4 @@
-const logger = {
+const Logger = {
   log: (message: string, tags: Array<string> = []) => {
     console.log(message);
   },
@@ -12,4 +12,4 @@ const logger = {
     console.error(message);
   }
 }
-export = logger;
+export = Logger;

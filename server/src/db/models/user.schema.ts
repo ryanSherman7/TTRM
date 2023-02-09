@@ -1,4 +1,5 @@
 let dbCollection = require('./schema.abstract.ts');
+import { PermissionsEnum } from "../../enums";
 
 var validateEmail = function(email: string) {
   var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -41,8 +42,17 @@ const userSchema = new dbCollection.dbSchema({
     sparse: true,
     match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email address']
   },
+  active: {
+    type: Boolean,
+    required: true,
+    default: true
+  },
   lastLogin: {
     type: Date
+  },
+  permissionLevel: {
+    type: String,
+    enum: PermissionsEnum.types
   }
 });
 

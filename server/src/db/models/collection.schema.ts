@@ -110,11 +110,6 @@ const collectionSchema = new dbCollection.dbSchema({
   // images used as the inspiraton for this collection
   conceptArt: [dbCollection.ObjectId],
   units: [unitSchema]
-}, {
-  timestamps: {
-    createdDate: 'createdDate',
-    lastModifiedDate: 'lastModifiedDate'
-  }
 })
 
 /* 
