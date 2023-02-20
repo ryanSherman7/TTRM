@@ -49,7 +49,7 @@ const UserService = {
           }
     },
     /**
-     * Sets active field to tfalserue for user
+     * Sets active field to false for user
      * @param {string} userId user object that will become user document
      * @param {express.response} response express.response
     */

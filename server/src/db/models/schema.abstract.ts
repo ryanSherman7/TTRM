@@ -11,17 +11,6 @@ const dbSchema = function(values: object): Schema {
   });
 };
 
-dbSchema.prototype.create = function(): Promise<any> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      await this.validate();
-      resolve(await this.save());
-    } catch (ex) {
-      reject(ex);
-    }
-  });
-}
-
 // additional data types
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
@@ -35,7 +24,16 @@ const create = function(this:any): Promise<any> {
     }
   });
 }
-const update = create;
+const update = function(this:any): Promise<any> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await this.validate();
+      resolve(await this.save());
+    } catch (ex) {
+      reject(ex);
+    }
+  });
+}
 
 // collection model
 function model(collectionName: string, schema: Object) {

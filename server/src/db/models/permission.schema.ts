@@ -1,11 +1,14 @@
 const dbCollection = require('./schema.abstract.ts');
 const logger = require('../../services/logger.service.ts');
 import { PermissionsEnum } from "../../enums";
-import type express = require('express');
 
 const permissionModel = new dbCollection.dbSchema({
   routeName: {
-    type: String,
+    type: String
+  },
+  active: {
+    type: Boolean,
+    default: true
   },
   permissionLevel: {
     type: String,
@@ -14,16 +17,6 @@ const permissionModel = new dbCollection.dbSchema({
 });
 
 const model = dbCollection.model('Permissions', permissionModel);
-// permissionModel.methods.create = function(): Promise<any> {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       await this.validate();
-//       resolve(await this.save());
-//     } catch (ex) {
-//       reject(ex);
-//     }
-//   });
-// }
 
 model.initPermissions = (apiPrefix: string, route: any): void => {
   try{
