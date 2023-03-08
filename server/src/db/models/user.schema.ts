@@ -56,16 +56,5 @@ const userSchema = new dbCollection.dbSchema({
   }
 });
 
-userSchema.methods.create = function(): Promise<any> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      await this.validate();
-      resolve(await this.save());
-    } catch (ex) {
-      reject(ex);
-    }
-  });
-}
-
 const model = dbCollection.model('Users', userSchema);
 export = model;
