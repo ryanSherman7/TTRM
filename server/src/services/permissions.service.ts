@@ -1,7 +1,8 @@
 import type express = require('express');
-import type User from '../interfaces/user.interface';
+import type UserInterface from '../interfaces/user.interface';
+import PermissionInterface from '../interfaces/permission.interface';
 import { PermissionsEnum } from "../enums";
-import type Permission from '../interfaces/permission.interface';
+import apiRequest from '../interfaces/request.interface';
 const PermissionModel = require('../db/models/permission.schema.ts');
 const responseHandler = require('../services/responseHandler.service.ts'); 
 const logger = require('../services/logger.service.ts');
@@ -9,10 +10,10 @@ const logger = require('../services/logger.service.ts');
 const PermissionService = {
     /**
      * Creates user permission document using Permission schema. Throws an error if object fails validation
-     * @param {object} perObject user object that will become user document
+     * @param {PermissionInterface} perObject user object that will become user document
      * @param {express.response} response express.response
     */
-    create: async (perObject: object, response: express.Response): Promise<void> => {
+    create: async (perObject: PermissionInterface, response: express.Response): Promise<void> => {
       try {
           const permission = new PermissionModel(perObject);
           const permissionDoc = await permission.create();
@@ -23,7 +24,12 @@ const PermissionService = {
           responseHandler.error(response, null, ex.message)
       }
     },
-    update: async (perObject: object, response: express.Response): Promise<void> => {
+    /**
+     * Updates user permission document using Permission schema. Throws an error if object fails validation
+     * @param {PermissionInterface} perObject user object that will become user document
+     * @param {express.response} response express.response
+    */
+    update: async (perObject: PermissionInterface, response: express.Response): Promise<void> => {
       try {
           const permission = new PermissionModel(perObject);
           const permissionDoc = await permission.update();
@@ -38,14 +44,14 @@ const PermissionService = {
      * Validates that the api request can be called by checking the permission collection
      * Returns 401 if invalid
      * Calls next if valid
-     * @param {express.response} response express.response
-     * @param {express.request} request express.request
+     * @param {express.Response} response express.response
+     * @param {express.Request} request express.request
      * @param {express.next} next express.next
     */
-    canCall: async (request: any, response: any, next: any): Promise<void> => {
+    canCall: async (request: apiRequest, response: express.Response, next: Function): Promise<void> => {
       try{
         let path: string = request.path;
-        const user: User = request.user;
+        const user: UserInterface | null = request.user || null;
 
         // verify that the path they are trying to call exists
         // formats path and returns as string
@@ -56,7 +62,7 @@ const PermissionService = {
         }
 
         // retrieve permissions for this path
-        const apiPermission: Permission = await PermissionModel.findOne({routeName: trimmedPath});
+        const apiPermission: PermissionInterface = await PermissionModel.findOne({routeName: trimmedPath});
 
         // Permission does not exist for this route
         if(!apiPermission){

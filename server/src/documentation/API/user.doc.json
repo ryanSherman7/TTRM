@@ -1,0 +1,97 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "version": "1.0.0",
+    "title": "TTRM API User Routes",
+    "description": "API endpoints for interacting with the user collection"
+  },
+  "servers": [{
+    "url": "https://tabletoprostermanager.com/api/v1/user"
+  }],
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "user"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": ["userName", "email", "firstName", "lastName", "active"],
+        "properties": {
+          "userName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "recoveryEmail": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$"
+          },
+          "lastLogin": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "permissionLevel": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "security": [{
+    "cookieAuth": []
+  }],
+  "paths": {
+    "/{userId}": {
+      "get": {
+        "summary": "Find user by _id",
+        "description": "Returns user document based on the _id provided by the client",
+        "operationId": "userFindById",
+        "parameters": [{
+          "name": "userId",
+          "description": "Id of the user",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type":"string"
+          }
+        }],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters supplied."
+          },
+          "500": {
+            "description": "Unexpected error has occurred, our IT team has been notified."
+          }
+        }
+      }
+    }
+  }
+}
+  
