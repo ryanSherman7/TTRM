@@ -1,10 +1,11 @@
+import initRoutes from './src/loaders/initRoutes.service';
+import ValidationService from './src/services/validation.service';
 const express = require("express");
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require("cors");
 const logger = require('./src/services/logger.service.ts');
 const PermissionService = require('./src/services/permissions.service.ts');
-import initRoutes from './src/loaders/initRoutes.service';
 
 // load our environment variables
 (function() {
@@ -17,13 +18,15 @@ import initRoutes from './src/loaders/initRoutes.service';
   }
 })();
 
-// middleware function that verifies that user can call API endpoint
+// middleware functions
 app.use(PermissionService.canCall);
-// initiates all api routes and creates permissions for each if they do not exist
-initRoutes(app);
+app.use(ValidationService.validateParameters);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
+
+// initiates all api routes and creates permissions for each if they do not exist
+initRoutes(app);
 
 // connect to our DB
 const dbo = require("./src/db/dbConnection");

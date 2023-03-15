@@ -58,13 +58,45 @@
     "cookieAuth": []
   }],
   "paths": {
-    "/{userId}": {
+    "/{id}": {
       "get": {
         "summary": "Find user by _id",
         "description": "Returns user document based on the _id provided by the client",
-        "operationId": "userFindById",
         "parameters": [{
-          "name": "userId",
+          "name": "id",
+          "description": "Id of the user",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type":"string"
+          }
+        }],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters supplied."
+          },
+          "500": {
+            "description": "Unexpected error has occurred, our IT team has been notified."
+          }
+        }
+      }
+    },
+    "/deactivate/{id}": {
+      "post":{
+        "summary": "Sets the active flag on user to false",
+        "description": "Updates a user (matching on id) and sets the active flag to false.",
+        "parameters": [{
+          "name": "id",
           "description": "Id of the user",
           "in": "path",
           "required": true,
