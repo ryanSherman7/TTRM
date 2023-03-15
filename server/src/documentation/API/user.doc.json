@@ -5,35 +5,63 @@
     "title": "TTRM API User Routes",
     "description": "API endpoints for interacting with the user collection"
   },
-  "servers": [{
-    "url": "https://tabletoprostermanager.com/api/v1/user"
-  }],
+  "servers": [
+    {
+      "url": "https://tabletoprostermanager.com/api/v1/user"
+    }
+  ],
   "components": {
     "securitySchemes": {
       "cookieAuth": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "user"
+        "name": "connect.sid"
+      },
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
       }
     },
     "schemas": {
+      "ObjectId": {
+        "type": "string",
+        "pattern": "/^[a-f\\d]$/i",
+        "maxLength": 24,
+        "minLength": 24
+      },
       "User": {
+        "additionalProperties": false,
         "type": "object",
-        "required": ["userName", "email", "firstName", "lastName", "active"],
+        "required": [
+          "userName",
+          "email",
+          "firstName",
+          "lastName",
+          "active"
+        ],
         "properties": {
           "userName": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$",
+            "maxLength": 50,
+            "minLength": 2,
+            "example": "testUserName7"
           },
           "email": {
             "type": "string",
             "format": "email",
-            "pattern": "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$"
+            "pattern": "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$",
+            "maxLength": 254
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 50,
+            "example": "Test"
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 50,
+            "example": "User"
           },
           "active": {
             "type": "boolean"
@@ -41,36 +69,47 @@
           "recoveryEmail": {
             "type": "string",
             "format": "email",
-            "pattern": "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$"
+            "pattern": "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$",
+            "maxLength": 254
           },
           "lastLogin": {
             "type": "string",
             "format": "date-time"
           },
           "permissionLevel": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MOD",
+              "USER",
+              "NONE"
+            ]
           }
         }
       }
     }
   },
-  "security": [{
-    "cookieAuth": []
-  }],
   "paths": {
     "/{id}": {
       "get": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "summary": "Find user by _id",
         "description": "Returns user document based on the _id provided by the client",
-        "parameters": [{
-          "name": "id",
-          "description": "Id of the user",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type":"string"
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the user",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ObjectId"
+            }
           }
-        }],
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -85,25 +124,247 @@
           "400": {
             "description": "Invalid parameters supplied."
           },
-          "500": {
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Unauthorized."
+          },
+          "404": {
+            "description": "Not Found."
+          },
+          "default": {
+            "description": "Unexpected error has occurred, our IT team has been notified."
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "summary": "Log into website using username and password",
+        "description": "Verifies that username and password match a user's credentials in the database. Set's a cookie in response header to be used in all subsequent API requests",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "pattern": "^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$",
+                    "maxLength": 50,
+                    "minLength": 2,
+                    "example": "testUserName7"
+                  },
+                  "password": {
+                    "type": "string",
+                    "maxLength": 50
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters supplied."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Unauthorized."
+          },
+          "404": {
+            "description": "Not Found."
+          },
+          "default": {
+            "description": "Unexpected error has occurred, our IT team has been notified."
+          }
+        }
+      }
+    },
+    "/create": {
+      "post": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Creates a new user document",
+        "description": "Validates request body against the user schema and creates a new user document if valid. Returns the updated user document",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters supplied."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Unauthorized."
+          },
+          "404": {
+            "description": "Not Found."
+          },
+          "default": {
+            "description": "Unexpected error has occurred, our IT team has been notified."
+          }
+        }
+      }
+    },
+    "/update": {
+      "post": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Updates a user's document",
+        "description": "Validates request body against the user schema and updates the document if valid and a match is found. Returns the updated user document.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters supplied."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Unauthorized."
+          },
+          "404": {
+            "description": "Not Found."
+          },
+          "default": {
+            "description": "Unexpected error has occurred, our IT team has been notified."
+          }
+        }
+      }
+    },
+    "/activate/{id}": {
+      "post": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Activates user by _id and returns updated user document",
+        "description": "Updates user document by querying on _id and setting the active flag to true. Returns the updated user document.",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the user",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ObjectId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters supplied."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Unauthorized."
+          },
+          "404": {
+            "description": "Not Found."
+          },
+          "default": {
             "description": "Unexpected error has occurred, our IT team has been notified."
           }
         }
       }
     },
     "/deactivate/{id}": {
-      "post":{
-        "summary": "Sets the active flag on user to false",
-        "description": "Updates a user (matching on id) and sets the active flag to false.",
-        "parameters": [{
-          "name": "id",
-          "description": "Id of the user",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type":"string"
+      "post": {
+        "security": [
+          {
+            "cookieAuth": []
           }
-        }],
+        ],
+        "summary": "Deactivates user by _id and returns updated user document",
+        "description": "Updates user document by querying on _id and setting the active flag to false. Returns the updated user document.",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the user",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ObjectId"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -117,6 +378,15 @@
           },
           "400": {
             "description": "Invalid parameters supplied."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Unauthorized."
+          },
+          "404": {
+            "description": "Not Found."
           },
           "500": {
             "description": "Unexpected error has occurred, our IT team has been notified."
@@ -126,4 +396,3 @@
     }
   }
 }
-  
