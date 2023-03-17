@@ -11,7 +11,8 @@ const userSchema = new dbCollection.dbSchema({
     type: String,
     required: true,
     trim: true,
-    unique: true
+    unique: true,
+    index: true
   },
   email: {
     type: String,

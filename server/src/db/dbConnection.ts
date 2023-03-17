@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-const logger = require('../../src/services/logger.service.ts')
+import {Logger}  from '../../src/services/utility/logger.service';
 const mongoose = require('mongoose');
 
 const dbUri = process.env.ATLAS_URI;
@@ -18,7 +18,7 @@ export = {
       if (db) {
         _db = db.db("ttrm");
         mongoose.connect(dbUri, options);
-        logger.info("Successfully connected to MongoDB.");
+        Logger.info("Successfully connected to MongoDB.");
       }
       return callback(err);
     });

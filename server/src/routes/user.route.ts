@@ -1,56 +1,99 @@
 import express = require('express');
 import apiRequest from '../interfaces/request.interface';
 const router = express.Router();
-const responseHandler = require('../services/responseHandler.service.ts');
+const responseHandler = require('../services/utility/responseHandler.service.ts');
 const UserService = require('../services/user.service.ts')
-const logger = require('../services/logger.service.ts');
 
-router.get('/user/:id', async (request: apiRequest, response: express.Response) => {
+router.get('/users/:id', async (request: apiRequest, response: express.Response, next) => {
   try {
-    UserService.get(request.body, response);
+    const id = request.params.id;
+
+    const user = await UserService.getById(id);
+    responseHandler.success(response, user, "User found.");
   } catch (ex: any) {
-    logger.error(ex)
-    responseHandler.error(response, null, ex.message)
+    next(ex);
   }
 });
 
-router.post('/user/create', async (request: apiRequest, response: express.Response) => {
+router.get('/users', async (request: apiRequest, response: express.Response, next) => {
   try {
-    UserService.create(request.body, response);
+    const params = request.params;
+
+    const user = await UserService.get(params);
+    responseHandler.success(response, user, "User found.");
   } catch (ex: any) {
-    logger.error(ex)
-    responseHandler.error(response, null, ex.message)
+    next(ex);
   }
 });
 
-// router.post('/user/update', (request: express.Request, response: express.Response) => {
+router.post('/users', async (request: apiRequest, response: express.Response, next) => {
+  try {
+    const user = await UserService.create(request.body);
+    responseHandler.success(response, user, "User Created.");
+  } catch (ex: any) {
+    next(ex);
+  }
+});
 
-//   responseHandler.success(response, null, "User updated.");
-// });
+router.put('/users/:id', async (request: apiRequest, response: express.Response, next) => {
+  try {
+    const id = request.params.id;
+    const update = request.body?.update;
+    const options = request.body?.options;
 
-router.post('/user/deactivate/:id', async (request: apiRequest, response: express.Response) => {
+    const user = await UserService.update({_id: id}, update, options);
+    responseHandler.success(response, user, "User Updated.");
+  } catch (ex: any) {
+    next(ex);
+  }
+});
+
+router.put('/users', async (request: apiRequest, response: express.Response, next) => {
+  try {
+    const query = request.body?.query;
+    const update = request.body?.update;
+
+    const user = await UserService.updateValidOnly(query, update);
+    responseHandler.success(response, user, "User Updated.");
+  } catch (ex: any) {
+    next(ex);
+  }
+});
+
+router.put('/users/:id/activate', async (request: apiRequest, response: express.Response, next) => {
   try {
     const userId: string = request.params.id;
-    UserService.deactivate(userId, response);
+
+    const user = await UserService.activate(userId);
+    responseHandler.success(response, user, "User activated.");
   } catch(ex: any) {
-    logger.error(ex)
-    responseHandler.error(response, null, ex.message)
+    next(ex);
   }
 });
 
-router.post('/user/activate/:id', async (request: apiRequest, response: express.Response) => {
+router.put('/users/:id/deactivate', async (request: apiRequest, response: express.Response, next) => {
   try {
     const userId: string = request.params.id;
-    UserService.activate(userId, response);
+    const user = await UserService.deactivate(userId);
+    responseHandler.success(response, user, "User deactivated.");
   } catch(ex: any) {
-    logger.error(ex)
-    responseHandler.error(response, null, ex.message)
+    next(ex);
   }
 });
 
 // router.post('/user/login', (request: express.Request, response: express.Response) => {
-
 //   responseHandler.success(response, null, "User login accepted.");
 // });
+
+// router.post('/user/signup', (request: express.Request, response: express.Response) => {
+//     try {
+//       const body: UserInterface = request.body;
+//       const user = await UserService.signup(body, response);
+//       responseHandler.success(response, user, "User found.");
+//     } catch(ex: any) {
+//       Logger.error(ex)
+//       responseHandler.error(response, null, ex.message)
+//     }
+//   });
 
 export = router

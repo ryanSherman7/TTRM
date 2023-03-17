@@ -1,11 +1,12 @@
 import initRoutes from './src/loaders/initRoutes.service';
-import ValidationService from './src/services/validation.service';
+import ValidationService from './src/services/utility/validation.service';
+import {Logger} from './src/services/utility/logger.service';
 const express = require("express");
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require("cors");
-const logger = require('./src/services/logger.service.ts');
 const PermissionService = require('./src/services/permissions.service.ts');
+const responseHandler = require('./src/services/utility/responseHandler.service.ts');
 
 // load our environment variables
 (function() {
@@ -14,19 +15,20 @@ const PermissionService = require('./src/services/permissions.service.ts');
     path: 'config.env'
   });
   if (result.error) {
-    logger.error("Warning: Starting server WITHOUT .env file")
+    Logger.error("Warning: Starting server WITHOUT .env file")
   }
 })();
 
 // middleware functions
-app.use(PermissionService.canCall);
-app.use(ValidationService.validateParameters);
+initRoutes(app);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
-
-// initiates all api routes and creates permissions for each if they do not exist
-initRoutes(app);
+app.use(PermissionService.canCall);
+app.use(ValidationService.validateParameters);
+// this should be the last middleware that we add,
+// it handles all errors, passed by calling next(ex)
+app.use(responseHandler.processError);
 
 // connect to our DB
 const dbo = require("./src/db/dbConnection");
@@ -36,7 +38,9 @@ const port = process.env.PORT || 5000;
 app.listen(port, () => {
   // perform a database connection when server starts
   dbo.connectToServer(function(err: Error) {
-    if (err) logger.error(err);
+    if (err){
+      Logger.error(err);
+    }
   });
-  logger.log(`TTRM server is running on port: ${port}`);
+  Logger.log(`TTRM server is running on port: ${port}`);
 });

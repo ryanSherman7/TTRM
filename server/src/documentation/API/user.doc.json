@@ -134,7 +134,7 @@
             "description": "Not Found."
           },
           "default": {
-            "description": "Unexpected error has occurred, our IT team has been notified."
+            "description": "An unexpected error has occurred, our IT team has been notified."
           }
         }
       }
@@ -195,7 +195,7 @@
             "description": "Not Found."
           },
           "default": {
-            "description": "Unexpected error has occurred, our IT team has been notified."
+            "description": "An unexpected error has occurred, our IT team has been notified."
           }
         }
       }
@@ -243,7 +243,7 @@
             "description": "Not Found."
           },
           "default": {
-            "description": "Unexpected error has occurred, our IT team has been notified."
+            "description": "An unexpected error has occurred, our IT team has been notified."
           }
         }
       }
@@ -291,7 +291,7 @@
             "description": "Not Found."
           },
           "default": {
-            "description": "Unexpected error has occurred, our IT team has been notified."
+            "description": "An unexpected error has occurred, our IT team has been notified."
           }
         }
       }
@@ -340,7 +340,7 @@
             "description": "Not Found."
           },
           "default": {
-            "description": "Unexpected error has occurred, our IT team has been notified."
+            "description": "An unexpected error has occurred, our IT team has been notified."
           }
         }
       }
@@ -389,7 +389,51 @@
             "description": "Not Found."
           },
           "500": {
-            "description": "Unexpected error has occurred, our IT team has been notified."
+            "description": "An unexpected error has occurred, our IT team has been notified."
+          }
+        }
+      }
+    },
+    "/signup": {
+      "post": {
+        "security": [],
+        "summary": "Initiates the sign-up process for a user.",
+        "description": "Validates and creates a new user document. After a successful insert, a sign-up event is published for sending the confirmation email and to finish setting up the user. Returns the newly created user document.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters supplied."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Unauthorized."
+          },
+          "404": {
+            "description": "Not Found."
+          },
+          "default": {
+            "description": "An unexpected error has occurred, our IT team has been notified."
           }
         }
       }

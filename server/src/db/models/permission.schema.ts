@@ -1,10 +1,11 @@
 const dbCollection = require('./schema.abstract.ts');
-const logger = require('../../services/logger.service.ts');
+import { Logger } from '../../services/utility/logger.service';
 import { PermissionsEnum } from "../../enums";
 
 const permissionModel = new dbCollection.dbSchema({
   routeName: {
-    type: String
+    type: String,
+    index: true
   },
   active: {
     type: Boolean,
@@ -25,7 +26,7 @@ model.initPermissions = (apiPrefix: string, route: any): void => {
         // trim out any thing added after the path
         let trimmedPath: any = endpoint?.route?.path?.replace(/\/:.*$/, '');
         if(!trimmedPath) {
-          logger.error(`Could not init permissions for ${endpoint?.route?.path}`);
+          Logger.error(`Could not init permissions for ${endpoint?.route?.path}`);
           return;
         }
         const fullRoute: string = apiPrefix + trimmedPath;
@@ -33,19 +34,19 @@ model.initPermissions = (apiPrefix: string, route: any): void => {
         if(!permission){
           // We do not have any permissions setup for this route
           // Create a new set of permissions for this route
-          logger.log(`Initiating permissions for ${fullRoute}`);
+          Logger.log(`Initiating permissions for ${fullRoute}`);
 
           const newPermission = await model({
             routeName: fullRoute,
             permissionLevel: PermissionsEnum.ADMIN
           });
-          console.log(newPermission)
+          Logger.log(newPermission)
           newPermission.create();
         }
       });
     }
-  } catch(ex) {
-    logger.error(ex);
+  } catch(ex: any) {
+    Logger.error(ex);
   }
 }
 export = model;

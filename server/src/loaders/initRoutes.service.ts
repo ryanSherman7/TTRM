@@ -8,8 +8,8 @@ export default async function initRoutes(app: any): Promise<void> {
     const dirPath = path.resolve(__dirname, '../routes');
     var routeFiles = fs.readdirSync(dirPath);
 
+    // needs some work
     routeFiles.map((fileName: string) => {
-        console.log(fileName);
         const route = require(`${dirPath}/${fileName}`);
         app.use(apiPrefix, route);
         PermissionModel.initPermissions(apiPrefix, route);
