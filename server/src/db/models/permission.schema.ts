@@ -14,6 +14,10 @@ const permissionModel = new dbCollection.dbSchema({
   permissionLevel: {
     type: String,
     enum: PermissionsEnum.types
+  },
+  method: {
+    type: String,
+    enum: PermissionsEnum.methods
   }
 });
 
@@ -30,19 +34,25 @@ model.initPermissions = (apiPrefix: string, route: any): void => {
           return;
         }
         const fullRoute: string = apiPrefix + trimmedPath;
-        const permission = await model.findOne({routeName: fullRoute});
-        if(!permission){
-          // We do not have any permissions setup for this route
-          // Create a new set of permissions for this route
-          Logger.log(`Initiating permissions for ${fullRoute}`);
 
-          const newPermission = await model({
-            routeName: fullRoute,
-            permissionLevel: PermissionsEnum.ADMIN
-          });
-          Logger.log(newPermission)
-          newPermission.create();
-        }
+        const methods = Object.keys(endpoint.route.methods);
+        methods.map(async (method) => {
+          method = method.toUpperCase();
+          const permission = await model.findOne({routeName: fullRoute, method: method});
+          if(!permission){
+            // We do not have any permissions setup for this route
+            // Create a new set of permissions for this route
+            Logger.log(`Initiating permissions for ${fullRoute}`);
+  
+            const newPermission = await model({
+              routeName: fullRoute,
+              method: method,
+              permissionLevel: PermissionsEnum.ADMIN
+            });
+            Logger.log(newPermission);
+            newPermission.create();
+          }
+        })
       });
     }
   } catch(ex: any) {

@@ -1,8 +1,8 @@
 import express = require('express');
-import apiRequest from '../interfaces/request.interface';
+import apiRequest from '../../interfaces/request.interface';
 const router = express.Router();
-const responseHandler = require('../services/utility/responseHandler.service.ts');
-const UserService = require('../services/user.service.ts')
+const responseHandler = require('../../services/utility/responseHandler.service.ts');
+const UserService = require('../../services/user.service.ts')
 
 router.get('/users/:id', async (request: apiRequest, response: express.Response, next) => {
   try {

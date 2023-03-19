@@ -1,5 +1,6 @@
 export const PermissionsEnum: any = {
     types: ["ADMIN", "MOD", "USER", "NONE"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     ADMIN: "ADMIN",
     MOD: "MOD",
     USER: "USER",

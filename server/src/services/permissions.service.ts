@@ -11,7 +11,6 @@ const PermissionService = {
   /**
    * Creates user permission document using Permission schema. Throws an error if object fails validation
    * @param {PermissionInterface} perObject user object that will become user document
-   * @param {express.response} response express.response
   */
   create: async (perObject: PermissionInterface): Promise<PermissionInterface> => {
     try {
@@ -25,7 +24,6 @@ const PermissionService = {
   /**
    * Updates user permission document using Permission schema. Throws an error if object fails validation
    * @param {PermissionInterface} perObject user object that will become user document
-   * @param {express.response} response express.response
   */
   update: async (perObject: PermissionInterface): Promise<PermissionInterface> => {
     try {
@@ -46,40 +44,40 @@ const PermissionService = {
   */
   canCall: async (request: apiRequest, response: express.Response, next: Function): Promise<void> => {
     try{
-      // let path: string = request.path;
-      // const user: UserInterface | null = request.user || null;
+      let path: string = request.path;
+      const user: UserInterface | null = request.user || null;
 
-      // // verify that the path they are trying to call exists
-      // // formats path and returns as string
-      // // returns a 404 error response if path is invalid
-      // const trimmedPath: string | null = PermissionService.verifyPath(path);
-      // if(!trimmedPath) {
-      //   responseHandler.notFound(response, null, "Invalid Path");
-      // }
+      // verify that the path they are trying to call exists
+      // formats path and returns as string
+      // returns a 404 error response if path is invalid
+      const trimmedPath: string | null = PermissionService.verifyPath(path);
+      if(!trimmedPath) {
+        responseHandler.notFound(response, null, "Invalid Path");
+      }
 
-      // // retrieve permissions for this path
-      // const apiPermission: PermissionInterface = await PermissionModel.findOne({routeName: trimmedPath});
+      // retrieve permissions for this path
+      const apiPermission: PermissionInterface = await PermissionModel.findOne({routeName: trimmedPath, method: request.method});
 
-      // // Permission does not exist for this route
-      // if(!apiPermission){
-      //   return responseHandler.notFound(response, null, "Invalid Path");
-      // }
-      // // check to see if the route is currently inactive
-      // if(!apiPermission.active) {
-      //   responseHandler.notFound(response, null, "Invalid Path");
-      // }
-      // // no permissions required to call route, next
-      // if(apiPermission.permissionLevel === PermissionsEnum.NONE) {
-      //   return next();
-      // }
-      // // user not logged in or no permissions, 401
-      // if(!user || !user.permissionLevel) {
-      //   return responseHandler.notFound(response, null, "Invalid Path");
-      // }
-      // // check to see if permission levels match, 401
-      // if(apiPermission.permissionLevel !== user.permissionLevel) {
-      //   return responseHandler.custom(response, null, "Unauthorized", 401);
-      // }
+      // Permission does not exist for this route
+      if(!apiPermission){
+        return responseHandler.notFound(response, null, "Invalid Path");
+      }
+      // check to see if the route is currently inactive
+      if(!apiPermission.active) {
+        responseHandler.notFound(response, null, "Invalid Path");
+      }
+      // no permissions required to call route, next
+      if(apiPermission.permissionLevel === PermissionsEnum.NONE) {
+        return next();
+      }
+      // user not logged in or no permissions, 401
+      if(!user || !user.permissionLevel) {
+        return responseHandler.notFound(response, null, "Invalid Path");
+      }
+      // check to see if permission levels match, 401
+      if(apiPermission.permissionLevel !== user.permissionLevel) {
+        return responseHandler.custom(response, null, "Unauthorized", 401);
+      }
 
       return next();
     }catch(ex: any) {
